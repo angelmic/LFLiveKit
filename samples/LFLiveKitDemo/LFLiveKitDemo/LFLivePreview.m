@@ -36,16 +36,20 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 @property (nonatomic, strong) UIButton *cameraButton;
 @property (nonatomic, strong) UIButton *closeButton;
 @property (nonatomic, strong) UIButton *startLiveButton;
+
 @property (nonatomic, strong) UIView *containerView;
-@property (nonatomic, strong) LFLiveDebug *debugInfo;
+
+@property (nonatomic, strong) LFLiveDebug   *debugInfo;
 @property (nonatomic, strong) LFLiveSession *session;
+
 @property (nonatomic, strong) UILabel *stateLabel;
 
 @end
 
 @implementation LFLivePreview
 
-- (instancetype)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame
+{
     if (self = [super initWithFrame:frame]) {
         self.backgroundColor = [UIColor clearColor];
         [self requestAccessForVideo];
@@ -61,7 +65,8 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 }
 
 #pragma mark -- Public Method
-- (void)requestAccessForVideo {
+- (void)requestAccessForVideo
+{
     __weak typeof(self) _self = self;
     AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
     switch (status) {
@@ -93,20 +98,29 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
     }
 }
 
-- (void)requestAccessForAudio {
+- (void)requestAccessForAudio
+{
     AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio];
+    
     switch (status) {
-    case AVAuthorizationStatusNotDetermined: {
-        [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
+        case AVAuthorizationStatusNotDetermined:
+        {
+            [AVCaptureDevice requestAccessForMediaType:AVMediaTypeAudio completionHandler:^(BOOL granted) {
             }];
-        break;
-    }
-    case AVAuthorizationStatusAuthorized: {
-        break;
-    }
+            
+        }
+            break;
+            
+    case AVAuthorizationStatusAuthorized:
+        {
+            
+        }
+            break;
+            
     case AVAuthorizationStatusDenied:
     case AVAuthorizationStatusRestricted:
         break;
+            
     default:
         break;
     }
@@ -114,23 +128,24 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 
 #pragma mark -- LFStreamingSessionDelegate
 /** live status changed will callback */
-- (void)liveSession:(nullable LFLiveSession *)session liveStateDidChange:(LFLiveState)state {
+- (void)liveSession:(nullable LFLiveSession *)session liveStateDidChange:(LFLiveState)state
+{
     NSLog(@"liveStateDidChange: %ld", state);
     switch (state) {
     case LFLiveReady:
-        _stateLabel.text = @"未连接";
+        _stateLabel.text = @"未連接";
         break;
     case LFLivePending:
-        _stateLabel.text = @"连接中";
+        _stateLabel.text = @"連線中";
         break;
     case LFLiveStart:
-        _stateLabel.text = @"已连接";
+        _stateLabel.text = @"已連接";
         break;
     case LFLiveError:
-        _stateLabel.text = @"连接错误";
+        _stateLabel.text = @"連接錯誤";
         break;
     case LFLiveStop:
-        _stateLabel.text = @"未连接";
+        _stateLabel.text = @"未連接";
         break;
     default:
         break;
@@ -138,17 +153,20 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 }
 
 /** live debug info callback */
-- (void)liveSession:(nullable LFLiveSession *)session debugInfo:(nullable LFLiveDebug *)debugInfo {
+- (void)liveSession:(nullable LFLiveSession *)session debugInfo:(nullable LFLiveDebug *)debugInfo
+{
     NSLog(@"debugInfo uploadSpeed: %@", formatedSpeed(debugInfo.currentBandwidth, debugInfo.elapsedMilli));
 }
 
 /** callback socket errorcode */
-- (void)liveSession:(nullable LFLiveSession *)session errorCode:(LFLiveSocketErrorCode)errorCode {
+- (void)liveSession:(nullable LFLiveSession *)session errorCode:(LFLiveSocketErrorCode)errorCode
+{
     NSLog(@"errorCode: %ld", errorCode);
 }
 
 #pragma mark -- Getter Setter
-- (LFLiveSession *)session {
+- (LFLiveSession *)session
+{
     if (!_session) {
         /**      发现大家有不会用横屏的请注意啦，横屏需要在ViewController  supportedInterfaceOrientations修改方向  默认竖屏  ****/
         /**      发现大家有不会用横屏的请注意啦，横屏需要在ViewController  supportedInterfaceOrientations修改方向  默认竖屏  ****/
@@ -157,6 +175,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 
         /***   默认分辨率368 ＊ 640  音频：44.1 iphone6以上48  双声道  方向竖屏 ***/
         
+        
         LFLiveVideoConfiguration *videoConfiguration = [LFLiveVideoConfiguration new];
         videoConfiguration.videoSize                = CGSizeMake(540, 960);
         videoConfiguration.videoBitRate             = 800*1024;
@@ -164,11 +183,13 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         videoConfiguration.videoMinBitRate          = 500*1024;
         videoConfiguration.videoFrameRate           = 24;
         videoConfiguration.videoMaxKeyframeInterval = 48;
-        videoConfiguration.outputImageOrientation   = UIInterfaceOrientationMaskPortrait;
+        videoConfiguration.outputImageOrientation   = UIInterfaceOrientationPortrait;
         videoConfiguration.autorotate               = NO;
         videoConfiguration.sessionPreset            = LFCaptureSessionPreset540x960;
         
         _session = [[LFLiveSession alloc] initWithAudioConfiguration:[LFLiveAudioConfiguration defaultConfiguration] videoConfiguration:videoConfiguration captureType:LFLiveCaptureDefaultMask];
+         
+       // _session = [[LFLiveSession alloc] initWithAudioConfiguration:[LFLiveAudioConfiguration defaultConfiguration] videoConfiguration:[LFLiveVideoConfiguration defaultConfigurationForQuality:LFLiveVideoQuality_High2]];
 
         /**    自己定制单声道  */
         /*
@@ -253,9 +274,9 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
            _session = [[LFLiveSession alloc] initWithAudioConfiguration:audioConfiguration videoConfiguration:videoConfiguration];
         */
 
-        _session.delegate = self;
+        _session.delegate      = self;
         _session.showDebugInfo = YES;
-        _session.preView = self;
+        _session.preView       = self;
         
         /*本地存储*/
 //        _session.saveLocalVideo = YES;
@@ -264,19 +285,20 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 //        NSURL *movieURL = [NSURL fileURLWithPath:pathToMovie];
 //        _session.saveLocalVideoPath = movieURL;
         
-        /*
+        
         UIImageView *imageView = [[UIImageView alloc] init];
-        imageView.alpha = 0.8;
-        imageView.frame = CGRectMake(100, 100, 100, 100);
+        imageView.alpha = 0.9;
+        imageView.frame = CGRectMake(10, 64, 100, 100);
         imageView.image = [UIImage imageNamed:@"pi"];
         _session.warterMarkView = imageView;
-         */
         
+        [_session setCaptureDevicePosition:AVCaptureDevicePositionBack];
     }
     return _session;
 }
 
-- (UIView *)containerView {
+- (UIView *)containerView
+{
     if (!_containerView) {
         _containerView = [UIView new];
         _containerView.frame = self.bounds;
@@ -286,24 +308,29 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
     return _containerView;
 }
 
-- (UILabel *)stateLabel {
+- (UILabel *)stateLabel
+{
     if (!_stateLabel) {
         _stateLabel = [[UILabel alloc] initWithFrame:CGRectMake(20, 20, 80, 40)];
-        _stateLabel.text = @"未连接";
+        _stateLabel.text = @"未連接";
         _stateLabel.textColor = [UIColor whiteColor];
         _stateLabel.font = [UIFont boldSystemFontOfSize:14.f];
     }
     return _stateLabel;
 }
 
-- (UIButton *)closeButton {
+- (UIButton *)closeButton
+{
     if (!_closeButton) {
-        _closeButton = [UIButton new];
+        _closeButton      = [UIButton new];
         _closeButton.size = CGSizeMake(44, 44);
         _closeButton.left = self.width - 10 - _closeButton.width;
-        _closeButton.top = 20;
+        _closeButton.top  = 20;
+        
         [_closeButton setImage:[UIImage imageNamed:@"close_preview"] forState:UIControlStateNormal];
+        
         _closeButton.exclusiveTouch = YES;
+        
         [_closeButton addBlockForControlEvents:UIControlEventTouchUpInside block:^(id sender) {
 
         }];
@@ -311,13 +338,17 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
     return _closeButton;
 }
 
-- (UIButton *)cameraButton {
+- (UIButton *)cameraButton
+{
     if (!_cameraButton) {
-        _cameraButton = [UIButton new];
-        _cameraButton.size = CGSizeMake(44, 44);
+        _cameraButton        = [UIButton new];
+        _cameraButton.size   = CGSizeMake(44, 44);
         _cameraButton.origin = CGPointMake(_closeButton.left - 10 - _cameraButton.width, 20);
+        
         [_cameraButton setImage:[UIImage imageNamed:@"camra_preview"] forState:UIControlStateNormal];
+        
         _cameraButton.exclusiveTouch = YES;
+        
         __weak typeof(self) _self = self;
         [_cameraButton addBlockForControlEvents:UIControlEventTouchUpInside block:^(id sender) {
             AVCaptureDevicePosition devicePositon = _self.session.captureDevicePosition;
@@ -327,20 +358,24 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
     return _cameraButton;
 }
 
-- (UIButton *)beautyButton {
+- (UIButton *)beautyButton
+{
     if (!_beautyButton) {
-        _beautyButton = [UIButton new];
-        _beautyButton.size = CGSizeMake(44, 44);
+        _beautyButton        = [UIButton new];
+        _beautyButton.size   = CGSizeMake(44, 44);
         _beautyButton.origin = CGPointMake(_cameraButton.left - 10 - _beautyButton.width, 20);
+        
         [_beautyButton setImage:[UIImage imageNamed:@"camra_beauty"] forState:UIControlStateNormal];
         [_beautyButton setImage:[UIImage imageNamed:@"camra_beauty_close"] forState:UIControlStateSelected];
+        
         _beautyButton.exclusiveTouch = YES;
+        
         __weak typeof(self) _self = self;
         [_beautyButton addBlockForControlEvents:UIControlEventTouchUpInside block:^(id sender) {
-            _self.session.beautyFace = !_self.session.beautyFace;
+            _self.session.beautyFace    = !_self.session.beautyFace;
             _self.beautyButton.selected = !_self.session.beautyFace;
             
-            
+            /*
             if (_self.session.beautyFace) {
                 UIImageView *imageView = [[UIImageView alloc] init];
                 imageView.alpha = 1.0;
@@ -354,33 +389,38 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
                 imageView.image = [UIImage imageNamed:@"503"];
                 _self.session.warterMarkView = imageView;
             }
+             */
         }];
     }
     return _beautyButton;
 }
 
-- (UIButton *)startLiveButton {
+- (UIButton *)startLiveButton
+{
     if (!_startLiveButton) {
-        _startLiveButton = [UIButton new];
-        _startLiveButton.size = CGSizeMake(self.width - 60, 44);
-        _startLiveButton.left = 30;
+        _startLiveButton        = [UIButton new];
+        _startLiveButton.size   = CGSizeMake(self.width - 60, 44);
+        _startLiveButton.left   = 30;
         _startLiveButton.bottom = self.height - 50;
+        
         _startLiveButton.layer.cornerRadius = _startLiveButton.height/2;
+        
         [_startLiveButton setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
         [_startLiveButton.titleLabel setFont:[UIFont systemFontOfSize:16]];
-        [_startLiveButton setTitle:@"开始直播" forState:UIControlStateNormal];
+        [_startLiveButton setTitle:@"開始直播" forState:UIControlStateNormal];
         [_startLiveButton setBackgroundColor:[UIColor colorWithRed:50 green:32 blue:245 alpha:1]];
         _startLiveButton.exclusiveTouch = YES;
+        
         __weak typeof(self) _self = self;
         [_startLiveButton addBlockForControlEvents:UIControlEventTouchUpInside block:^(id sender) {
             _self.startLiveButton.selected = !_self.startLiveButton.selected;
             if (_self.startLiveButton.selected) {
-                [_self.startLiveButton setTitle:@"结束直播" forState:UIControlStateNormal];
+                [_self.startLiveButton setTitle:@"結束直播" forState:UIControlStateNormal];
                 LFLiveStreamInfo *stream = [LFLiveStreamInfo new];
                 stream.url = @"rtmp://live.hkstv.hk.lxdns.com:1935/live/stream168";
                 [_self.session startLive:stream];
             } else {
-                [_self.startLiveButton setTitle:@"开始直播" forState:UIControlStateNormal];
+                [_self.startLiveButton setTitle:@"開始直播" forState:UIControlStateNormal];
                 [_self.session stopLive];
             }
         }];

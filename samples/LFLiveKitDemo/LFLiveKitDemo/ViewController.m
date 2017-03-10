@@ -15,20 +15,24 @@
 
 @implementation ViewController
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
      [self.view addSubview:[[LFLivePreview alloc] initWithFrame:self.view.bounds]];
 }
-
-- (UIInterfaceOrientationMask)supportedInterfaceOrientations {
+/*
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
     //return UIInterfaceOrientationMaskLandscape;
     return UIInterfaceOrientationMaskPortrait;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+{
     //return YES;
     return NO;
 }
+ */
 
 @end
