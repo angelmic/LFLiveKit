@@ -156,16 +156,18 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 
 
         /***   默认分辨率368 ＊ 640  音频：44.1 iphone6以上48  双声道  方向竖屏 ***/
+        
         LFLiveVideoConfiguration *videoConfiguration = [LFLiveVideoConfiguration new];
-        videoConfiguration.videoSize = CGSizeMake(640, 360);
-        videoConfiguration.videoBitRate = 800*1024;
-        videoConfiguration.videoMaxBitRate = 1000*1024;
-        videoConfiguration.videoMinBitRate = 500*1024;
-        videoConfiguration.videoFrameRate = 24;
+        videoConfiguration.videoSize                = CGSizeMake(540, 960);
+        videoConfiguration.videoBitRate             = 800*1024;
+        videoConfiguration.videoMaxBitRate          = 1000*1024;
+        videoConfiguration.videoMinBitRate          = 500*1024;
+        videoConfiguration.videoFrameRate           = 24;
         videoConfiguration.videoMaxKeyframeInterval = 48;
-        videoConfiguration.outputImageOrientation = UIInterfaceOrientationLandscapeLeft;
-        videoConfiguration.autorotate = NO;
-        videoConfiguration.sessionPreset = LFCaptureSessionPreset720x1280;
+        videoConfiguration.outputImageOrientation   = UIInterfaceOrientationMaskPortrait;
+        videoConfiguration.autorotate               = NO;
+        videoConfiguration.sessionPreset            = LFCaptureSessionPreset540x960;
+        
         _session = [[LFLiveSession alloc] initWithAudioConfiguration:[LFLiveAudioConfiguration defaultConfiguration] videoConfiguration:videoConfiguration captureType:LFLiveCaptureDefaultMask];
 
         /**    自己定制单声道  */
@@ -252,7 +254,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         */
 
         _session.delegate = self;
-        _session.showDebugInfo = NO;
+        _session.showDebugInfo = YES;
         _session.preView = self;
         
         /*本地存储*/
@@ -265,9 +267,10 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         /*
         UIImageView *imageView = [[UIImageView alloc] init];
         imageView.alpha = 0.8;
-        imageView.frame = CGRectMake(100, 100, 29, 29);
-        imageView.image = [UIImage imageNamed:@"ios-29x29"];
-        _session.warterMarkView = imageView;*/
+        imageView.frame = CGRectMake(100, 100, 100, 100);
+        imageView.image = [UIImage imageNamed:@"pi"];
+        _session.warterMarkView = imageView;
+         */
         
     }
     return _session;
@@ -336,6 +339,21 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         [_beautyButton addBlockForControlEvents:UIControlEventTouchUpInside block:^(id sender) {
             _self.session.beautyFace = !_self.session.beautyFace;
             _self.beautyButton.selected = !_self.session.beautyFace;
+            
+            
+            if (_self.session.beautyFace) {
+                UIImageView *imageView = [[UIImageView alloc] init];
+                imageView.alpha = 1.0;
+                imageView.frame = CGRectMake(100, 100, 100, 100);
+                imageView.image = [UIImage imageNamed:@"pi"];
+                _self.session.warterMarkView = imageView;
+            } else {
+                UIImageView *imageView = [[UIImageView alloc] init];
+                imageView.alpha = 1.0;
+                imageView.frame = CGRectMake(100, 100, 100, 100);
+                imageView.image = [UIImage imageNamed:@"503"];
+                _self.session.warterMarkView = imageView;
+            }
         }];
     }
     return _beautyButton;
@@ -359,7 +377,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
             if (_self.startLiveButton.selected) {
                 [_self.startLiveButton setTitle:@"结束直播" forState:UIControlStateNormal];
                 LFLiveStreamInfo *stream = [LFLiveStreamInfo new];
-                stream.url = @"rtmp://live.hkstv.hk.lxdns.com:1935/live/stream153";
+                stream.url = @"rtmp://live.hkstv.hk.lxdns.com:1935/live/stream168";
                 [_self.session startLive:stream];
             } else {
                 [_self.startLiveButton setTitle:@"开始直播" forState:UIControlStateNormal];
