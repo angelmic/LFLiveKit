@@ -32,6 +32,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 
 @interface LFLivePreview ()<LFLiveSessionDelegate>
 
+@property (nonatomic, strong) UIButton *faceDetectionButton;
 @property (nonatomic, strong) UIButton *beautyButton;
 @property (nonatomic, strong) UIButton *cameraButton;
 @property (nonatomic, strong) UIButton *closeButton;
@@ -59,6 +60,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         [self.containerView addSubview:self.closeButton];
         [self.containerView addSubview:self.cameraButton];
         [self.containerView addSubview:self.beautyButton];
+        [self.containerView addSubview:self.faceDetectionButton];
         [self.containerView addSubview:self.startLiveButton];
     }
     return self;
@@ -130,7 +132,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 /** live status changed will callback */
 - (void)liveSession:(nullable LFLiveSession *)session liveStateDidChange:(LFLiveState)state
 {
-    NSLog(@"liveStateDidChange: %ld", state);
+    NSLog(@"liveStateDidChange: %ld", (unsigned long)state);
     switch (state) {
     case LFLiveReady:
         _stateLabel.text = @"未連接";
@@ -161,7 +163,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 /** callback socket errorcode */
 - (void)liveSession:(nullable LFLiveSession *)session errorCode:(LFLiveSocketErrorCode)errorCode
 {
-    NSLog(@"errorCode: %ld", errorCode);
+    NSLog(@"errorCode: %ld", (unsigned long)errorCode);
 }
 
 #pragma mark -- Getter Setter
@@ -292,7 +294,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         imageView.image = [UIImage imageNamed:@"pi"];
         _session.warterMarkView = imageView;
         
-        [_session setCaptureDevicePosition:AVCaptureDevicePositionBack];
+        //[_session setCaptureDevicePosition:AVCaptureDevicePositionBack];
     }
     return _session;
 }
@@ -375,24 +377,32 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
             _self.session.beautyFace    = !_self.session.beautyFace;
             _self.beautyButton.selected = !_self.session.beautyFace;
             
-            /*
-            if (_self.session.beautyFace) {
-                UIImageView *imageView = [[UIImageView alloc] init];
-                imageView.alpha = 1.0;
-                imageView.frame = CGRectMake(100, 100, 100, 100);
-                imageView.image = [UIImage imageNamed:@"pi"];
-                _self.session.warterMarkView = imageView;
-            } else {
-                UIImageView *imageView = [[UIImageView alloc] init];
-                imageView.alpha = 1.0;
-                imageView.frame = CGRectMake(100, 100, 100, 100);
-                imageView.image = [UIImage imageNamed:@"503"];
-                _self.session.warterMarkView = imageView;
-            }
-             */
         }];
     }
     return _beautyButton;
+}
+
+- (UIButton *)faceDetectionButton
+{
+    if (!_faceDetectionButton) {
+        _faceDetectionButton = [UIButton new];
+        _faceDetectionButton.size = CGSizeMake(44, 44);
+        _faceDetectionButton.origin = CGPointMake(_beautyButton.left - 10 - _faceDetectionButton.width, 20);
+        
+        [_faceDetectionButton setImage:[UIImage imageNamed:@"face_detection"] forState:UIControlStateNormal];
+        [_faceDetectionButton setImage:[UIImage imageNamed:@"face_detection"] forState:UIControlStateSelected];
+        
+        _faceDetectionButton.exclusiveTouch = YES;
+        
+        __weak typeof(self) _self = self;
+        [_faceDetectionButton addBlockForControlEvents:UIControlEventTouchUpInside block:^(id sender) {
+            _self.session.faceTracking         = !_self.session.faceTracking;
+            _self.faceDetectionButton.selected = !_self.session.faceTracking;
+            
+        }];
+    }
+    
+    return _faceDetectionButton;
 }
 
 - (UIButton *)startLiveButton

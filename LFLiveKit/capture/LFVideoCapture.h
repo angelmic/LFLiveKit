@@ -38,6 +38,9 @@
 /** The beautyFace control capture shader filter empty or beautiy */
 @property (nonatomic, assign) BOOL beautyFace;
 
+/** Basic face tracking feature */
+@property (nonatomic, assign) BOOL faceTracking;
+
 /** The torch control capture flash is on or off */
 @property (nonatomic, assign) BOOL torch;
 

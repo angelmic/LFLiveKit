@@ -10,6 +10,8 @@
 #import "LFGPUImageBeautyFilter.h"
 #import "LFGPUImageEmptyFilter.h"
 
+#import "PPFaceDetectionCamera.h"
+
 #if __has_include(<GPUImage/GPUImage.h>)
 #import <GPUImage/GPUImage.h>
 #elif __has_include("GPUImage/GPUImage.h")
@@ -20,7 +22,8 @@
 
 @interface LFVideoCapture ()
 
-@property (nonatomic, strong) GPUImageVideoCamera             *videoCamera;
+//@property (nonatomic, strong) GPUImageVideoCamera             *videoCamera;
+@property (nonatomic, strong) PPFaceDetectionCamera           *videoCamera;
 
 @property (nonatomic, strong) GPUImageOutput<GPUImageInput>   *filter;
 @property (nonatomic, strong) GPUImageOutput<GPUImageInput>   *output;
@@ -37,6 +40,12 @@
 @property (nonatomic, strong) UIView                          *waterMarkContentView;
 
 @property (nonatomic, strong) GPUImageMovieWriter             *movieWriter;
+
+@property (nonatomic, assign) CGAffineTransform               cameraOutputToPreviewFrameTransform;
+@property (nonatomic, assign) CGAffineTransform               portraitRotationTransform;
+@property (nonatomic, assign) CGAffineTransform               texelToPixelTransform;
+@property (nonatomic, strong) UIView                          *faceMetadataTrackingView;
+@property (nonatomic, assign) CFTimeInterval                  lastUpdateTime;
 
 @end
 
@@ -61,6 +70,8 @@
         self.brightLevel = 0.5;
         self.zoomScale   = 1.0;
         self.mirror      = YES;
+        
+        _lastUpdateTime  = CACurrentMediaTime();
     }
     return self;
 }
@@ -79,12 +90,153 @@
     }
 }
 
+#pragma mark - FaceDetector
+- (void)startFaceDetection
+{
+    if (!self.faceTracking)
+        return;
+    
+    [self.videoCamera stopCameraCapture];
+    
+    typeof(self) __weak weakSelf = self;
+    [self.videoCamera beginDetecting:kMachineAndFaceMetaData
+                           codeTypes:@[AVMetadataObjectTypeQRCode]
+                  withDetectionBlock:^(PPFaceDetectionOptions detectionType, NSArray *detectedObjects, CGRect clapOrRectZero) {
+                      
+                      if (detectedObjects.count) {
+                          //NSLog(@"Detected objects %@", detectedObjects);
+                      }
+                      
+                      if (detectionType & kFaceFeatures) {
+                          //
+                      } else if (detectionType | kFaceMetaData) {
+                          [weakSelf updateFaceMetadataTrackingViewWithObjects:detectedObjects];
+                      }
+                  }];
+    
+    [self.videoCamera startCameraCapture];
+}
+
+- (void)stopFaceDetection
+{
+    [self.videoCamera stopCameraCapture];
+    
+    [self.videoCamera stopAllDetection];
+    
+    self.faceMetadataTrackingView.hidden = YES;
+    self.warterMarkView = self.faceMetadataTrackingView;
+    
+    [self.videoCamera startCameraCapture];
+}
+
+- (void)updateFaceMetadataTrackingViewWithObjects:(NSArray *)objects
+{
+    if (objects && !objects.count) {
+        if (self.faceMetadataTrackingView.hidden == NO) {
+            self.faceMetadataTrackingView.hidden = YES;
+            self.warterMarkView = self.faceMetadataTrackingView;
+        }
+    } else {
+        
+        CFTimeInterval currentTime = CACurrentMediaTime();
+        
+        if ((currentTime - _lastUpdateTime) < (1/15.0)) {
+            return;
+        }
+        
+        self.lastUpdateTime = currentTime;
+        
+        AVMetadataFaceObject * metadataObject = objects[0];
+        
+        CGRect face = metadataObject.bounds;
+        
+        // Flip the Y coordinate to compensate for coordinate difference
+        //face.origin.y = 1.0 - face.origin.y - face.size.height;
+        
+        // Transform to go from texels, which are relative to the image size to pixel values
+        face = CGRectApplyAffineTransform(face, self.portraitRotationTransform);
+        face = CGRectApplyAffineTransform(face, self.texelToPixelTransform);
+        face = CGRectApplyAffineTransform(face, self.cameraOutputToPreviewFrameTransform);
+        
+        self.faceMetadataTrackingView.frame  = face;
+        self.faceMetadataTrackingView.hidden = NO;
+        
+        self.warterMarkView = self.faceMetadataTrackingView;
+    }
+}
+
+- (void)setupFaceTrackingView
+{
+    self.faceMetadataTrackingView = [[UIView alloc] initWithFrame:CGRectZero];
+    
+    self.faceMetadataTrackingView.layer.borderColor      = [[UIColor greenColor] CGColor];
+    self.faceMetadataTrackingView.layer.borderWidth      = 4;
+    self.faceMetadataTrackingView.backgroundColor        = [UIColor clearColor];
+    self.faceMetadataTrackingView.hidden                 = YES;
+    self.faceMetadataTrackingView.userInteractionEnabled = NO;
+}
+
+- (void)calculateTransformations
+{
+    NSInteger outputHeight = [[self.videoCamera.captureSession.outputs[0] videoSettings][@"Height"] integerValue];
+    NSInteger outputWidth = [[self.videoCamera.captureSession.outputs[0] videoSettings][@"Width"] integerValue];
+    
+    if (UIInterfaceOrientationIsPortrait(self.videoCamera.outputImageOrientation)) {
+        // Portrait mode, swap width & height
+        NSInteger temp = outputWidth;
+        outputWidth = outputHeight;
+        outputHeight = temp;
+    }
+    
+    // Use self.view because self.cameraView is not resized at this point (if 3.5" device)
+    CGFloat viewHeight = self.preView.frame.size.height;
+    CGFloat viewWidth  = self.preView.frame.size.width;
+    
+    // Calculate the scale and offset of the view vs the camera output
+    // This depends on the fillmode of the GPUImageView
+    CGFloat scale;
+    CGAffineTransform frameTransform;
+    switch (self.gpuImageView.fillMode) {
+        case kGPUImageFillModePreserveAspectRatio:
+            scale = MIN(viewWidth / outputWidth, viewHeight / outputHeight);
+            frameTransform = CGAffineTransformMakeScale(scale, scale);
+            frameTransform = CGAffineTransformTranslate(frameTransform, -(outputWidth * scale - viewWidth)/2, -(outputHeight * scale - viewHeight)/2 );
+            break;
+        case kGPUImageFillModePreserveAspectRatioAndFill:
+            scale = MAX(viewWidth / outputWidth, viewHeight / outputHeight);
+            frameTransform = CGAffineTransformMakeScale(scale, scale);
+            frameTransform = CGAffineTransformTranslate(frameTransform, -(outputWidth * scale - viewWidth)/2, -(outputHeight * scale - viewHeight)/2 );
+            break;
+        case kGPUImageFillModeStretch:
+            frameTransform = CGAffineTransformMakeScale(viewWidth / outputWidth, viewHeight / outputHeight);
+            break;
+    }
+    self.cameraOutputToPreviewFrameTransform = frameTransform;
+    
+    // In portrait mode, need to swap x & y coordinates of the returned boxes
+    if (UIInterfaceOrientationIsPortrait(self.videoCamera.outputImageOrientation)) {
+        // Interchange x & y
+        self.portraitRotationTransform = CGAffineTransformMake(0, 1, 1, 0, 0, 0);
+    }
+    else {
+        self.portraitRotationTransform = CGAffineTransformIdentity;
+    }
+    
+    // AVMetaDataOutput works in texels (relative to the image size)
+    // We need to transform this to pixels through simple scaling
+    self.texelToPixelTransform = CGAffineTransformMakeScale(outputWidth, outputHeight);
+    
+}
+
 #pragma mark - Setter Getter
 
-- (GPUImageVideoCamera *)videoCamera
+//- (GPUImageVideoCamera *)videoCamera
+- (PPFaceDetectionCamera *)videoCamera
 {
     if(!_videoCamera){
-        _videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:_configuration.avSessionPreset cameraPosition:AVCaptureDevicePositionFront];
+        //_videoCamera = [[GPUImageVideoCamera alloc] initWithSessionPreset:_configuration.avSessionPreset cameraPosition:AVCaptureDevicePositionFront];
+        
+        _videoCamera = [[PPFaceDetectionCamera alloc] initWithSessionPreset:_configuration.avSessionPreset cameraPosition:AVCaptureDevicePositionFront];
         
         _videoCamera.outputImageOrientation              = _configuration.outputImageOrientation;
         _videoCamera.horizontallyMirrorFrontFacingCamera = NO;
@@ -110,6 +262,10 @@
     } else {
         [UIApplication sharedApplication].idleTimerDisabled = YES;
         [self reloadFilter];
+        
+        [self setupFaceTrackingView];
+        [self calculateTransformations];
+        
         [self.videoCamera startCameraCapture];
         if(self.saveLocalVideo)
             [self.movieWriter startRecording];
@@ -209,6 +365,20 @@
 {
     _beautyFace = beautyFace;
     [self reloadFilter];
+}
+
+- (void)setFaceTracking:(BOOL)faceTracking
+{
+    if (_faceTracking == faceTracking)
+        return;
+    
+    _faceTracking = faceTracking;
+    
+    if (_faceTracking) {
+        [self startFaceDetection];
+    } else {
+        [self stopFaceDetection];
+    }
 }
 
 - (void)setBeautyLevel:(CGFloat)beautyLevel

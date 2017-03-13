@@ -251,6 +251,13 @@
     [self didChangeValueForKey:@"beautyFace"];
 }
 
+- (void)setFaceTracking:(BOOL)faceTracking
+{
+    [self willChangeValueForKey:@"faceTracking"];
+    [self.videoCaptureSource setFaceTracking:faceTracking];
+    [self didChangeValueForKey:@"faceTracking"];
+}
+
 - (BOOL)saveLocalVideo{
     return self.videoCaptureSource.saveLocalVideo;
 }
@@ -270,6 +277,10 @@
 
 - (BOOL)beautyFace {
     return self.videoCaptureSource.beautyFace;
+}
+
+- (BOOL)faceTracking {
+    return self.videoCaptureSource.faceTracking;
 }
 
 - (void)setBeautyLevel:(CGFloat)beautyLevel {

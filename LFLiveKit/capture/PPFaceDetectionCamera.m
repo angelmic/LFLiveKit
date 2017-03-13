@@ -24,7 +24,7 @@
         self.delegate = self;
         
         NSDictionary *detectorOptions = @{
-                                          CIDetectorAccuracy : CIDetectorAccuracyLow,
+                                          CIDetectorAccuracy : CIDetectorAccuracyHigh,
                                           };
         
         self.faceDetector = [CIDetector detectorOfType:CIDetectorTypeFace context:nil options:detectorOptions];

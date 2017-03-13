@@ -74,6 +74,9 @@ typedef NS_ENUM(NSInteger,LFLiveCaptureTypeMask) {
 /** The beautyFace control capture shader filter empty or beautiy */
 @property (nonatomic, assign) BOOL beautyFace;
 
+/** Basic face tracking feature */
+@property (nonatomic, assign) BOOL faceTracking;
+
 /** The beautyLevel control beautyFace Level. Default is 0.5, between 0.0 ~ 1.0 */
 @property (nonatomic, assign) CGFloat beautyLevel;
 
