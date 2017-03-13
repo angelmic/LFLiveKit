@@ -115,26 +115,26 @@
              @"Do not use kMachineReadableMetaData with kMachineAndFaceMetaData, just use kMachineAndFaceMetaData");
     
     if (options & kFaceMetaData) {
-        NSAssert([delegate respondsToSelector:@selector(detectorWillOuputFaceMetadata:)],
+        NSAssert([delegate respondsToSelector:@selector(detectorWillOutputFaceMetadata:)],
                  @"Your detection delegate must respond to detectorWillOuputFaceMetadata: in order to detect kFaceMetadata");
     }
     
     if (options & kMachineReadableMetaData) {
-        NSAssert([delegate respondsToSelector:@selector(detectorWillOuputMachineReadableMetadata:)],
+        NSAssert([delegate respondsToSelector:@selector(detectorWillOutputMachineReadableMetadata:)],
                  @"Your detection delegate must respond to detectorWillOuputMachineReadableMetadata: in order to detect kMachineReadableMetaData");
         NSAssert(machineCodeTypesOrNil.count,
                  @"If you'd like to track machine codes, you need to supply an array of types to track");
     }
     
     if (options & kMachineAndFaceMetaData) {
-        NSAssert([delegate respondsToSelector:@selector(detectorWillOuputMachineAndFaceMetadata:)],
+        NSAssert([delegate respondsToSelector:@selector(detectorWillOutputMachineAndFaceMetadata:)],
                  @"Your detection delegate must respond to detectorWillOuputMachineAndFaceMetadata: in order to detect kMachineAndFaceMetaData");
         NSAssert(machineCodeTypesOrNil.count,
                  @"If you'd like to track machine codes, you need to supply an array of types to track");
     }
     
     if (options & kFaceFeatures) {
-        NSAssert([delegate respondsToSelector:@selector(detectorWillOuputFaceFeatures:inClap:)],
+        NSAssert([delegate respondsToSelector:@selector(detectorWillOutputFaceFeatures:inClap:)],
                  @"Your detection delegate must respond to detectorWillOutputFaceFeatures:inClap: in order to detect kFaceFeatures");
     }
     
