@@ -23,6 +23,7 @@
 @interface LFVideoCapture ()
 
 //@property (nonatomic, strong) GPUImageVideoCamera             *videoCamera;
+// ref: https://github.com/BradLarson/GPUImage/issues/794
 @property (nonatomic, strong) PPFaceDetectionCamera           *videoCamera;
 
 @property (nonatomic, strong) GPUImageOutput<GPUImageInput>   *filter;
