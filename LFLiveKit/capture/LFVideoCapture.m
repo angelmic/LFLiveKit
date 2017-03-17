@@ -46,6 +46,7 @@
 @property (nonatomic, assign) CGAffineTransform               portraitRotationTransform;
 @property (nonatomic, assign) CGAffineTransform               texelToPixelTransform;
 @property (nonatomic, strong) UIView                          *faceMetadataTrackingView;
+@property (nonatomic, strong) UIView                          *faceMarkView;
 @property (nonatomic, assign) CFTimeInterval                  lastUpdateTime;
 
 @end
@@ -125,7 +126,8 @@
     [self.videoCamera stopAllDetection];
     
     self.faceMetadataTrackingView.hidden = YES;
-    self.warterMarkView = self.faceMetadataTrackingView;
+    //self.warterMarkView = self.faceMetadataTrackingView;
+    self.faceMarkView = self.faceMetadataTrackingView;
     
     [self.videoCamera startCameraCapture];
 }
@@ -135,7 +137,8 @@
     if (objects && !objects.count) {
         if (self.faceMetadataTrackingView.hidden == NO) {
             self.faceMetadataTrackingView.hidden = YES;
-            self.warterMarkView = self.faceMetadataTrackingView;
+            //self.warterMarkView = self.faceMetadataTrackingView;
+            self.faceMarkView = self.faceMetadataTrackingView;
         }
     } else {
         
@@ -165,7 +168,8 @@
         self.faceMetadataTrackingView.frame  = face;
         self.faceMetadataTrackingView.hidden = NO;
         
-        self.warterMarkView = self.faceMetadataTrackingView;
+        //self.warterMarkView = self.faceMetadataTrackingView;
+        self.faceMarkView = self.faceMetadataTrackingView;
     }
 }
 
@@ -296,11 +300,19 @@
     if(captureDevicePosition == self.videoCamera.cameraPosition)
         return;
     
+    if (self.faceTracking) {
+        [self stopFaceDetection];
+    }
+    
     [self.videoCamera rotateCamera];
     
     self.videoCamera.frameRate = (int32_t)_configuration.videoFrameRate;
     
     [self reloadMirror];
+    
+    if (self.faceTracking) {
+        [self startFaceDetection];
+    }
 }
 
 - (AVCaptureDevicePosition)captureDevicePosition
@@ -447,6 +459,18 @@
     [self reloadFilter];
 }
 
+- (void)setFaceMarkView:(UIView *)faceMarkView
+{
+    if (_faceMarkView && _faceMarkView.superview) {
+        [_faceMarkView removeFromSuperview];
+        _faceMarkView = nil;
+    }
+    _faceMarkView = faceMarkView;
+    [self.waterMarkContentView addSubview:_faceMarkView];
+    
+    [self reloadFilter];
+}
+
 - (GPUImageUIElement *)uiElementInput
 {
     if(!_uiElementInput) {
@@ -554,7 +578,7 @@
     }
     
     //< 添加水印
-    if(self.warterMarkView){
+    if(self.faceMarkView || self.warterMarkView){
         [self.filter addTarget:self.blendFilter];
         [self.uiElementInput addTarget:self.blendFilter];
         [self.blendFilter addTarget:self.gpuImageView];
