@@ -152,7 +152,10 @@
         CGRect face = metadataObject.bounds;
         
         // Flip the Y coordinate to compensate for coordinate difference
-        //face.origin.y = 1.0 - face.origin.y - face.size.height;
+        if (self.videoCamera.cameraPosition == AVCaptureDevicePositionBack)
+            face.origin.y = 1.0 - face.origin.y - face.size.height;
+        
+        //face.origin.x = 1.0 - face.origin.x - face.size.width;
         
         // Transform to go from texels, which are relative to the image size to pixel values
         face = CGRectApplyAffineTransform(face, self.portraitRotationTransform);
@@ -180,7 +183,7 @@
 - (void)calculateTransformations
 {
     NSInteger outputHeight = [[self.videoCamera.captureSession.outputs[0] videoSettings][@"Height"] integerValue];
-    NSInteger outputWidth = [[self.videoCamera.captureSession.outputs[0] videoSettings][@"Width"] integerValue];
+    NSInteger outputWidth  = [[self.videoCamera.captureSession.outputs[0] videoSettings][@"Width"] integerValue];
     
     if (UIInterfaceOrientationIsPortrait(self.videoCamera.outputImageOrientation)) {
         // Portrait mode, swap width & height
