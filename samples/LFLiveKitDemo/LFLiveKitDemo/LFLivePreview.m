@@ -279,7 +279,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         _session.delegate      = self;
         _session.showDebugInfo = YES;
         _session.preView       = self;
-        
+        _session.muted         = YES;
         /*本地存储*/
 //        _session.saveLocalVideo = YES;
 //        NSString *pathToMovie = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Movie.mp4"];
