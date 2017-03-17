@@ -160,7 +160,7 @@
         // Transform to go from texels, which are relative to the image size to pixel values
         face = CGRectApplyAffineTransform(face, self.portraitRotationTransform);
         face = CGRectApplyAffineTransform(face, self.texelToPixelTransform);
-        face = CGRectApplyAffineTransform(face, self.cameraOutputToPreviewFrameTransform);
+        //face = CGRectApplyAffineTransform(face, self.cameraOutputToPreviewFrameTransform);
         
         self.faceMetadataTrackingView.frame  = face;
         self.faceMetadataTrackingView.hidden = NO;
