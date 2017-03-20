@@ -34,6 +34,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
 
 @property (nonatomic, strong) UIButton *faceDetectionButton;
 @property (nonatomic, strong) UIButton *beautyButton;
+@property (nonatomic, strong) UIButton *maskButton;
 @property (nonatomic, strong) UIButton *cameraButton;
 @property (nonatomic, strong) UIButton *closeButton;
 @property (nonatomic, strong) UIButton *startLiveButton;
@@ -61,6 +62,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         [self.containerView addSubview:self.cameraButton];
         [self.containerView addSubview:self.beautyButton];
         [self.containerView addSubview:self.faceDetectionButton];
+        [self.containerView addSubview:self.maskButton];
         [self.containerView addSubview:self.startLiveButton];
     }
     return self;
@@ -280,6 +282,8 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         _session.showDebugInfo = YES;
         _session.preView       = self;
         _session.muted         = YES;
+        _session.faceTracking  = YES;
+        
         /*本地存储*/
 //        _session.saveLocalVideo = YES;
 //        NSString *pathToMovie = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Movie.mp4"];
@@ -289,10 +293,11 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         
         
         UIImageView *imageView = [[UIImageView alloc] init];
-        imageView.alpha = 0.9;
+        imageView.alpha = 1.0;
         imageView.frame = CGRectMake(10, 64, 100, 100);
         imageView.image = [UIImage imageNamed:@"pi"];
         _session.warterMarkView = imageView;
+        
         
         //[_session setCaptureDevicePosition:AVCaptureDevicePositionBack];
     }
@@ -390,7 +395,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         _faceDetectionButton.origin = CGPointMake(_beautyButton.left - 10 - _faceDetectionButton.width, 20);
         
         [_faceDetectionButton setImage:[UIImage imageNamed:@"face_detection"] forState:UIControlStateNormal];
-        [_faceDetectionButton setImage:[UIImage imageNamed:@"face_detection"] forState:UIControlStateSelected];
+        [_faceDetectionButton setImage:[UIImage imageNamed:@"face_detection_close"] forState:UIControlStateSelected];
         
         _faceDetectionButton.exclusiveTouch = YES;
         
@@ -404,6 +409,57 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
     
     return _faceDetectionButton;
 }
+
+- (UIButton *)maskButton
+{
+    if (!_maskButton) {
+        _maskButton        = [UIButton new];
+        _maskButton.size   = CGSizeMake(44, 44);
+        _maskButton.origin = CGPointMake(_faceDetectionButton.left - 10 - _maskButton.width, 20);
+        
+        [_maskButton setImage:[UIImage imageNamed:@"mask_00"] forState:UIControlStateNormal];
+        
+        _maskButton.exclusiveTouch = YES;
+        
+        __weak typeof(self) _self = self;
+        NSInteger __block seleted = 0;
+        [_maskButton addBlockForControlEvents:UIControlEventTouchUpInside block:^(id sender) {
+            seleted++;
+            
+            switch (seleted % 4) {
+                case 0:
+                    seleted = 0;
+                    _self.session.eyesMaskImage = nil;
+                    [_self.maskButton setImage:[UIImage imageNamed:@"mask_00"] forState:UIControlStateNormal];
+                    break;
+                    
+                case 1:
+                    seleted = 1;
+                    _self.session.eyesMaskImage = [UIImage imageNamed:@"ti"];
+                    [_self.maskButton setImage:[UIImage imageNamed:@"mask_01"] forState:UIControlStateNormal];
+                    break;
+                    
+                case 2:
+                    seleted = 2;
+                    _self.session.eyesMaskImage = [UIImage imageNamed:@"mosaic"];
+                    [_self.maskButton setImage:[UIImage imageNamed:@"mask_02"] forState:UIControlStateNormal];
+                    break;
+                    
+                case 3:
+                    seleted = 3;
+                    _self.session.eyesMaskImage = [UIImage imageNamed:@"allpay"];
+                    [_self.maskButton setImage:[UIImage imageNamed:@"mask_03"] forState:UIControlStateNormal];
+                    break;
+                    
+                default:
+                    break;
+            }
+            
+        }];
+    }
+    return _maskButton;
+}
+
 
 - (UIButton *)startLiveButton
 {

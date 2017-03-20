@@ -31,7 +31,7 @@
 {
     if (_eyesImageView == nil) {
         _eyesImageView = [UIImageView new];
-        [self addSubview:_headImageView];
+        [self addSubview:_eyesImageView];
     }
     return _eyesImageView;
 }
@@ -53,21 +53,23 @@
     }
 }
 
-- (void)setFrame:(CGRect)frame
+- (void)updateMaskWithAngle:(CGFloat)angle
 {
-    [super setFrame:frame];
-    
-    CGFloat faceH = frame.size.height;
-    CGFloat faceW = frame.size.width;
+    CGFloat faceH = self.frame.size.height;
+    CGFloat faceW = self.frame.size.width;
     
     // eyes
     if (_eyesImage != nil) {
+        self.eyesImageView.transform = CGAffineTransformIdentity;
+        
         CGFloat eyesX = 0.0;
-        CGFloat eyesY = faceH * 0.2;
-        CGFloat eyesH = faceH * 0.2;
+        CGFloat eyesY = faceH * 0.15;
+        CGFloat eyesH = faceH * 0.3;
         CGFloat eyesW = faceW;
         
         self.eyesImageView.frame = CGRectMake(eyesX, eyesY, eyesW, eyesH);
+        
+        self.eyesImageView.transform = CGAffineTransformMakeRotation(M_PI * angle / 180.0);
     }
 }
 

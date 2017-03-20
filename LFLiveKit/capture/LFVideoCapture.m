@@ -12,6 +12,8 @@
 
 #import "PPFaceDetectionCamera.h"
 
+#import "PPFaceCanvasView.h"
+
 #if __has_include(<GPUImage/GPUImage.h>)
 #import <GPUImage/GPUImage.h>
 #elif __has_include("GPUImage/GPUImage.h")
@@ -45,8 +47,9 @@
 @property (nonatomic, assign) CGAffineTransform               cameraOutputToPreviewFrameTransform;
 @property (nonatomic, assign) CGAffineTransform               portraitRotationTransform;
 @property (nonatomic, assign) CGAffineTransform               texelToPixelTransform;
-@property (nonatomic, strong) UIView                          *faceMetadataTrackingView;
+//@property (nonatomic, strong) UIView                          *faceMetadataTrackingView;
 @property (nonatomic, strong) UIView                          *faceMarkView;
+@property (nonatomic, strong) PPFaceCanvasView                *faceCanvasView;
 @property (nonatomic, assign) CFTimeInterval                  lastUpdateTime;
 
 @end
@@ -125,9 +128,10 @@
     
     [self.videoCamera stopAllDetection];
     
-    self.faceMetadataTrackingView.hidden = YES;
+    //self.faceMetadataTrackingView.hidden = YES;
+    self.faceCanvasView.hidden = YES;
     //self.warterMarkView = self.faceMetadataTrackingView;
-    self.faceMarkView = self.faceMetadataTrackingView;
+    self.faceMarkView = self.faceCanvasView;
     
     [self.videoCamera startCameraCapture];
 }
@@ -135,22 +139,24 @@
 - (void)updateFaceMetadataTrackingViewWithObjects:(NSArray *)objects
 {
     if (objects && !objects.count) {
-        if (self.faceMetadataTrackingView.hidden == NO) {
-            self.faceMetadataTrackingView.hidden = YES;
-            //self.warterMarkView = self.faceMetadataTrackingView;
-            self.faceMarkView = self.faceMetadataTrackingView;
+        if (self.faceCanvasView.hidden == NO) {
+            self.faceCanvasView.hidden = YES;
+            //self.warterMarkView = self.faceCanvasView;
+            self.faceMarkView = self.faceCanvasView;
         }
     } else {
         
         CFTimeInterval currentTime = CACurrentMediaTime();
         
-        if ((currentTime - _lastUpdateTime) < (1/15.0)) {
+        if ((currentTime - _lastUpdateTime) < (1/20.0)) {
             return;
         }
         
         self.lastUpdateTime = currentTime;
         
         AVMetadataFaceObject * metadataObject = objects[0];
+        
+        //NSLog(@"faceObj: %@", metadataObject);
         
         CGRect face = metadataObject.bounds;
         
@@ -165,16 +171,21 @@
         face = CGRectApplyAffineTransform(face, self.texelToPixelTransform);
         //face = CGRectApplyAffineTransform(face, self.cameraOutputToPreviewFrameTransform);
         
-        self.faceMetadataTrackingView.frame  = face;
-        self.faceMetadataTrackingView.hidden = NO;
+        self.faceCanvasView.frame  = face;
+        self.faceCanvasView.hidden = NO;
         
         //self.warterMarkView = self.faceMetadataTrackingView;
-        self.faceMarkView = self.faceMetadataTrackingView;
+        
+        [self.faceCanvasView updateMaskWithAngle:(270.0 - metadataObject.rollAngle)];
+        self.faceMarkView = self.faceCanvasView;
+        
+        //self.faceMarkView = self.faceMetadataTrackingView;
     }
 }
 
 - (void)setupFaceTrackingView
 {
+    /*
     self.faceMetadataTrackingView = [[UIView alloc] initWithFrame:CGRectZero];
     
     self.faceMetadataTrackingView.layer.borderColor      = [[UIColor greenColor] CGColor];
@@ -182,6 +193,18 @@
     self.faceMetadataTrackingView.backgroundColor        = [UIColor clearColor];
     self.faceMetadataTrackingView.hidden                 = YES;
     self.faceMetadataTrackingView.userInteractionEnabled = NO;
+     */
+}
+
+- (PPFaceCanvasView *)faceCanvasView
+{
+    if (_faceCanvasView == nil) {
+        _faceCanvasView = [PPFaceCanvasView new];
+        //_faceCanvasView.layer.borderColor = [UIColor greenColor].CGColor;
+        //_faceCanvasView.layer.borderWidth = 4.0;
+        //_faceCanvasView.eyesImage = [UIImage imageNamed:@"ti"];
+    }
+    return _faceCanvasView;
 }
 
 - (void)calculateTransformations
@@ -457,6 +480,14 @@
     [self.waterMarkContentView addSubview:_warterMarkView];
     
     [self reloadFilter];
+}
+
+- (void)setEyesMaskImage:(UIImage *)eyesMaskImage
+{
+    if (_eyesMaskImage != eyesMaskImage) {
+        _eyesMaskImage = eyesMaskImage;
+        self.faceCanvasView.eyesImage = _eyesMaskImage;
+    }
 }
 
 - (void)setFaceMarkView:(UIView *)faceMarkView

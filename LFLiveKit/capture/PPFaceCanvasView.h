@@ -13,4 +13,6 @@
 @property (nonatomic, strong) UIImage *headImage;
 @property (nonatomic, strong) UIImage *eyesImage;
 
+- (void)updateMaskWithAngle:(CGFloat)angle;
+
 @end

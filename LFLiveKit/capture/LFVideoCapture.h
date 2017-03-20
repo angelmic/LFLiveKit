@@ -62,6 +62,8 @@
 /*** The warterMarkView control whether the watermark is displayed or not ,if set ni,will remove watermark,otherwise add *.*/
 @property (nonatomic, strong, nullable) UIView *warterMarkView;
 
+@property (nonatomic, strong, nullable) UIImage *eyesMaskImage;
+
 /* The currentImage is videoCapture shot */
 @property (nonatomic, strong, nullable) UIImage *currentImage;
 
