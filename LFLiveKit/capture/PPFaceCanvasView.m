@@ -33,6 +33,7 @@
         _eyesImageView = [UIImageView new];
         [self addSubview:_headImageView];
     }
+    return _eyesImageView;
 }
 
 #pragma mark - Setter
