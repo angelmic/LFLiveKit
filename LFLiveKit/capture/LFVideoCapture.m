@@ -176,7 +176,11 @@
         
         //self.warterMarkView = self.faceMetadataTrackingView;
         
-        [self.faceCanvasView updateMaskWithAngle:(270.0 - metadataObject.rollAngle)];
+        if (self.videoCamera.cameraPosition == AVCaptureDevicePositionBack)
+            [self.faceCanvasView updateMaskWithAngle:-(270.0 - metadataObject.rollAngle)];
+        else
+            [self.faceCanvasView updateMaskWithAngle:(270.0 - metadataObject.rollAngle)];
+        
         self.faceMarkView = self.faceCanvasView;
         
         //self.faceMarkView = self.faceMetadataTrackingView;
