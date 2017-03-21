@@ -86,7 +86,7 @@
         CGFloat X = - faceW * 0.3;
         CGFloat Y = - faceH * 0.2;
         CGFloat W = faceW * 1.6;
-        CGFloat H = faceH * 1.6;
+        CGFloat H = faceH * 1.5;
         
         self.faceImageView.frame = CGRectMake(X, Y, W, H);
         self.faceImageView.transform = CGAffineTransformMakeRotation(M_PI * angle / 180.0);
