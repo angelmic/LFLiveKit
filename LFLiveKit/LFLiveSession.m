@@ -351,12 +351,20 @@
     [self.videoCaptureSource setEyesMaskImage:eyesMaskImage];
 }
 
+- (void)setFaceMaskImage:(UIImage *)faceMaskImage {
+    [self.videoCaptureSource setFaceMaskImage:faceMaskImage];
+}
+
 - (nullable UIView*)warterMarkView{
     return self.videoCaptureSource.warterMarkView;
 }
 
 - (nullable UIImage *)eyesMaskImage {
     return self.videoCaptureSource.eyesMaskImage;
+}
+
+- (nullable UIImage *)faceMaskImage {
+    return self.videoCaptureSource.faceMaskImage;
 }
 
 - (nullable UIImage *)currentImage{

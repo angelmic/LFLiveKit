@@ -122,6 +122,7 @@ typedef NS_ENUM(NSInteger,LFLiveCaptureTypeMask) {
 @property (nonatomic, strong, nullable) UIView *warterMarkView;
 
 @property (nonatomic, strong, nullable) UIImage *eyesMaskImage;
+@property (nonatomic, strong, nullable) UIImage *faceMaskImage;
 
 /* The currentImage is videoCapture shot */
 @property (nonatomic, strong,readonly ,nullable) UIImage *currentImage;

@@ -430,24 +430,28 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
                 case 0:
                     seleted = 0;
                     _self.session.eyesMaskImage = nil;
+                    _self.session.faceMaskImage = nil;
                     [_self.maskButton setImage:[UIImage imageNamed:@"mask_00"] forState:UIControlStateNormal];
                     break;
                     
                 case 1:
                     seleted = 1;
                     _self.session.eyesMaskImage = [UIImage imageNamed:@"ti"];
+                    _self.session.faceMaskImage = nil;
                     [_self.maskButton setImage:[UIImage imageNamed:@"mask_01"] forState:UIControlStateNormal];
                     break;
                     
                 case 2:
                     seleted = 2;
-                    _self.session.eyesMaskImage = [UIImage imageNamed:@"mosaic"];
+                    _self.session.faceMaskImage = [UIImage imageNamed:@"hacker"];
+                    _self.session.eyesMaskImage = nil;
                     [_self.maskButton setImage:[UIImage imageNamed:@"mask_02"] forState:UIControlStateNormal];
                     break;
                     
                 case 3:
                     seleted = 3;
                     _self.session.eyesMaskImage = [UIImage imageNamed:@"allpay"];
+                    _self.session.faceMaskImage = nil;
                     [_self.maskButton setImage:[UIImage imageNamed:@"mask_03"] forState:UIControlStateNormal];
                     break;
                     

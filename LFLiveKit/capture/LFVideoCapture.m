@@ -148,7 +148,7 @@
         
         CFTimeInterval currentTime = CACurrentMediaTime();
         
-        if ((currentTime - _lastUpdateTime) < (1/20.0)) {
+        if ((currentTime - _lastUpdateTime) < (1/24.0)) {
             return;
         }
         
@@ -491,6 +491,14 @@
     if (_eyesMaskImage != eyesMaskImage) {
         _eyesMaskImage = eyesMaskImage;
         self.faceCanvasView.eyesImage = _eyesMaskImage;
+    }
+}
+
+- (void)setFaceMaskImage:(UIImage *)faceMaskImage
+{
+    if (_faceMaskImage != faceMaskImage) {
+        _faceMaskImage = faceMaskImage;
+        self.faceCanvasView.faceImage = _faceMaskImage;
     }
 }
 
