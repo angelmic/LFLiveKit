@@ -426,7 +426,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
         [_maskButton addBlockForControlEvents:UIControlEventTouchUpInside block:^(id sender) {
             seleted++;
             
-            switch (seleted % 4) {
+            switch (seleted % 5) {
                 case 0:
                     seleted = 0;
                     _self.session.eyesMaskImage = nil;
@@ -443,7 +443,7 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
                     
                 case 2:
                     seleted = 2;
-                    _self.session.faceMaskImage = [UIImage imageNamed:@"hacker"];
+                    _self.session.faceMaskImage = [UIImage imageNamed:@"jobs"];
                     _self.session.eyesMaskImage = nil;
                     [_self.maskButton setImage:[UIImage imageNamed:@"mask_02"] forState:UIControlStateNormal];
                     break;
@@ -453,6 +453,13 @@ inline static NSString *formatedSpeed(float bytes, float elapsed_milli) {
                     _self.session.eyesMaskImage = [UIImage imageNamed:@"allpay"];
                     _self.session.faceMaskImage = nil;
                     [_self.maskButton setImage:[UIImage imageNamed:@"mask_03"] forState:UIControlStateNormal];
+                    break;
+                    
+                case 4:
+                    seleted = 4;
+                    _self.session.faceMaskImage = [UIImage imageNamed:@"hacker"];
+                    _self.session.eyesMaskImage = nil;
+                    [_self.maskButton setImage:[UIImage imageNamed:@"mask_04"] forState:UIControlStateNormal];
                     break;
                     
                 default:

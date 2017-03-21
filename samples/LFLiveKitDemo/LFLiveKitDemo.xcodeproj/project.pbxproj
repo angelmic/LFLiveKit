@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		79222F0B1E80EA2300A19BD0 /* mask_04.png in Resources */ = {isa = PBXBuildFile; fileRef = 79222F0A1E80EA2300A19BD0 /* mask_04.png */; };
 		792235EF1E767A4300767115 /* face_detection@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 792235ED1E767A4300767115 /* face_detection@2x.png */; };
 		792235F01E767A4300767115 /* face_detection@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 792235EE1E767A4300767115 /* face_detection@3x.png */; };
 		79BA1D741E7FCC33000441F2 /* face_detection_close@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 79BA1D721E7FCC33000441F2 /* face_detection_close@2x.png */; };
@@ -40,6 +41,7 @@
 /* Begin PBXFileReference section */
 		289A9C4510CD7EA6F4CE9897 /* Pods-LFLiveKitDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LFLiveKitDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-LFLiveKitDemo/Pods-LFLiveKitDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		5B1CCEEE06FCFAF75D105A51 /* libPods-LFLiveKitDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-LFLiveKitDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		79222F0A1E80EA2300A19BD0 /* mask_04.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = mask_04.png; sourceTree = "<group>"; };
 		792235ED1E767A4300767115 /* face_detection@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "face_detection@2x.png"; sourceTree = "<group>"; };
 		792235EE1E767A4300767115 /* face_detection@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "face_detection@3x.png"; sourceTree = "<group>"; };
 		79BA1D721E7FCC33000441F2 /* face_detection_close@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "face_detection_close@2x.png"; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 				79BA1D771E7FCD8D000441F2 /* mask_01.png */,
 				79BA1D781E7FCD8D000441F2 /* mask_02.png */,
 				79BA1D791E7FCD8D000441F2 /* mask_03.png */,
+				79222F0A1E80EA2300A19BD0 /* mask_04.png */,
 			);
 			path = images;
 			sourceTree = "<group>";
@@ -252,6 +255,7 @@
 			files = (
 				84D8B45F1D75782700752B56 /* camra_beauty_close@2x.png in Resources */,
 				84D8B4391D75778B00752B56 /* LaunchScreen.storyboard in Resources */,
+				79222F0B1E80EA2300A19BD0 /* mask_04.png in Resources */,
 				84D8B45D1D75782700752B56 /* camra_beauty@2x.png in Resources */,
 				84D8B4361D75778B00752B56 /* Assets.xcassets in Resources */,
 				79BA1D7D1E7FCD8D000441F2 /* mask_03.png in Resources */,
