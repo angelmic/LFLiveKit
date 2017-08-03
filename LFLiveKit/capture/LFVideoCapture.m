@@ -424,6 +424,14 @@
     }
 }
 
+- (void)setSquareMode:(BOOL)squareMode
+{
+    if (_squareMode == squareMode)
+        return;
+    
+    _squareMode = squareMode;
+}
+
 - (void)setBeautyLevel:(CGFloat)beautyLevel
 {
     _beautyLevel = beautyLevel;
@@ -536,8 +544,8 @@
 {
     if(!_waterMarkContentView) {
         _waterMarkContentView = [UIView new];
-        //_waterMarkContentView.frame = CGRectMake(0, 0, self.configuration.videoSize.width, self.configuration.videoSize.height);
-        _waterMarkContentView.frame = [UIScreen mainScreen].bounds;
+        _waterMarkContentView.frame = CGRectMake(0, 0, self.configuration.videoSize.width, self.configuration.videoSize.height);
+        //_waterMarkContentView.frame = [UIScreen mainScreen].bounds;
         _waterMarkContentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     }
     return _waterMarkContentView;
@@ -611,16 +619,34 @@
     ///< 调节镜像
     [self reloadMirror];
     
-    //< 480*640 比例为4:3  强制转换为16:9
-    if([self.configuration.avSessionPreset isEqualToString:AVCaptureSessionPreset640x480]){
-        CGRect cropRect = self.configuration.landscape ? CGRectMake(0, 0.125, 1, 0.75) : CGRectMake(0.125, 0, 0.75, 1);
-        self.cropfilter = [[GPUImageCropFilter alloc] initWithCropRegion:cropRect];
+    
+    if (self.squareMode) {
+        // 強制 square mode
+        CGFloat W = [UIScreen mainScreen].bounds.size.width;
+        CGFloat H = [UIScreen mainScreen].bounds.size.height;
+        CGFloat x = 0.0;
+        CGFloat y = ((H - W) / 2)/H;
+        CGFloat w = 1.0;
+        CGFloat h = 1.0 * W/H;
+        
+        self.cropfilter = [[GPUImageCropFilter alloc] initWithCropRegion:CGRectMake(x, y, w, h)];
         [self.videoCamera addTarget:self.cropfilter];
         [self.cropfilter addTarget:self.filter];
-    }else{
-        [self.videoCamera addTarget:self.filter];
+        
+    } else {
+        // 480*640 比例为4:3  强制转换为16:9
+        
+        if([self.configuration.avSessionPreset isEqualToString:AVCaptureSessionPreset640x480]){
+            CGRect cropRect = self.configuration.landscape ? CGRectMake(0, 0.125, 1, 0.75) : CGRectMake(0.125, 0, 0.75, 1);
+            self.cropfilter = [[GPUImageCropFilter alloc] initWithCropRegion:cropRect];
+            [self.videoCamera addTarget:self.cropfilter];
+            [self.cropfilter addTarget:self.filter];
+        }else{
+            [self.videoCamera addTarget:self.filter];
+        }
+        
     }
-    
+
     //< 添加水印
     if(self.faceMarkView || self.warterMarkView){
         [self.filter addTarget:self.blendFilter];

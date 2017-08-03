@@ -258,6 +258,13 @@
     [self didChangeValueForKey:@"faceTracking"];
 }
 
+- (void)setSquareMode:(BOOL)squareMode
+{
+    [self willChangeValueForKey:@"squareMode"];
+    [self.videoCaptureSource setSquareMode:squareMode];
+    [self didChangeValueForKey:@"squareMode"];
+}
+
 - (BOOL)saveLocalVideo{
     return self.videoCaptureSource.saveLocalVideo;
 }
@@ -281,6 +288,10 @@
 
 - (BOOL)faceTracking {
     return self.videoCaptureSource.faceTracking;
+}
+
+- (BOOL)squareMode {
+    return self.videoCaptureSource.squareMode;
 }
 
 - (void)setBeautyLevel:(CGFloat)beautyLevel {

@@ -41,6 +41,8 @@
 /** Basic face tracking feature */
 @property (nonatomic, assign) BOOL faceTracking;
 
+@property (nonatomic, assign) BOOL squareMode;
+
 /** The torch control capture flash is on or off */
 @property (nonatomic, assign) BOOL torch;
 
