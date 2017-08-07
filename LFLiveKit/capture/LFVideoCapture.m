@@ -430,6 +430,12 @@
         return;
     
     _squareMode = squareMode;
+    
+    if (_squareMode) {
+        _waterMarkContentView.frame = CGRectMake(0, 0, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.width);
+    } else {
+        _waterMarkContentView.frame = [UIScreen mainScreen].bounds;
+    }
 }
 
 - (void)setBeautyLevel:(CGFloat)beautyLevel
@@ -544,8 +550,8 @@
 {
     if(!_waterMarkContentView) {
         _waterMarkContentView = [UIView new];
-        _waterMarkContentView.frame = CGRectMake(0, 0, self.configuration.videoSize.width, self.configuration.videoSize.height);
-        //_waterMarkContentView.frame = [UIScreen mainScreen].bounds;
+        //_waterMarkContentView.frame = CGRectMake(0, 0, self.configuration.videoSize.width, self.configuration.videoSize.height);
+        _waterMarkContentView.frame = [UIScreen mainScreen].bounds;
         _waterMarkContentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     }
     return _waterMarkContentView;
